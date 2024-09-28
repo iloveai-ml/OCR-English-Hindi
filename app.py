@@ -4,7 +4,7 @@ import torch
 from transformers import AutoProcessor, VisionEncoderDecoderModel
 token="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"
 # Load the ColPali implementation and Qwen2-VL model
-ocr_model_name = "Qwen/Qwen2-VL-7B-Instruct"  # Update with the correct Hugging Face model path if needed
+ocr_model_name = "stepfun-ai/GOT-OCR2_0"  # Update with the correct Hugging Face model path if needed
 processor = AutoProcessor.from_pretrained(ocr_model_name,token=token)
 ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token)
 
