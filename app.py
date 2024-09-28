@@ -1,24 +1,25 @@
 import streamlit as st
 from PIL import Image
 import torch
-from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+from transformers import AutoProcessor, AutoModelForTokenClassification
 
-# Load the model and tokenizer
-model_name = "Salesforce/codet5-base"  # Change this to the correct model
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-processor = ViTImageProcessor.from_pretrained(model_name)
-model = VisionEncoderDecoderModel.from_pretrained(model_name)
+# Load the model and processor
+model_name = "google/got-base"  # Using General OCR Theory (GOT) model
+processor = AutoProcessor.from_pretrained(model_name)
+model = AutoModelForTokenClassification.from_pretrained(model_name)
 
 def extract_text(image):
-    """Extracts text from the given image using the chosen OCR model."""
-    # Prepare image for model
-    inputs = processor(images=image, return_tensors="pt")
+    """Extracts text from the given image using the GOT model."""
+    # Prepare the image for the model
+    inputs = processor(image, return_tensors="pt")
 
     # Perform OCR
-    output = model.generate(**inputs)
+    with torch.no_grad():
+        outputs = model(**inputs)
 
-    # Decode the generated text
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+    # Decode the outputs to get the extracted text
+    extracted_text = processor.decode(outputs.logits.argmax(dim=-1), skip_special_tokens=True)
+    return extracted_text
 
 def main():
     st.title("OCR Web Application")
@@ -55,5 +56,4 @@ def main():
             else:
                 st.error(f"Keyword '{search_keyword}' not found.")
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__ma
