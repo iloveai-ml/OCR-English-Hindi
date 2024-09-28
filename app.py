@@ -56,4 +56,5 @@ def main():
             else:
                 st.error(f"Keyword '{search_keyword}' not found.")
 
-if __name__ == "__ma
+if __name__ == "__main__":
+    main()
