@@ -1,29 +1,29 @@
 import streamlit as st
 from PIL import Image
 import torch
-from transformers import AutoProcessor, AutoModelForTokenClassification
+from transformers import AutoProcessor, VisionEncoderDecoderModel
 token="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"
-# Load the model and processor
-model_name = "google/got-base"  # Using General OCR Theory (GOT) model
-processor = AutoProcessor.from_pretrained(model_name)
-model = AutoModelForTokenClassification.from_pretrained(model_name,token=token)
+# Load the ColPali implementation and Qwen2-VL model
+ocr_model_name = "Qwen/Qwen2-VL-7B-Instruct"  # Update with the correct Hugging Face model path if needed
+processor = AutoProcessor.from_pretrained(ocr_model_name,token=token)
+ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token)
 
 def extract_text(image):
-    """Extracts text from the given image using the GOT model."""
+    """Extracts text from the given image using the ColPali OCR model."""
     # Prepare the image for the model
-    inputs = processor(image, return_tensors="pt")
+    inputs = processor(images=image, return_tensors="pt")
 
     # Perform OCR
     with torch.no_grad():
-        outputs = model(**inputs)
+        output = ocr_model.generate(**inputs)
 
-    # Decode the outputs to get the extracted text
-    extracted_text = processor.decode(outputs.logits.argmax(dim=-1), skip_special_tokens=True)
+    # Decode the generated text
+    extracted_text = processor.decode(output[0], skip_special_tokens=True)
     return extracted_text
 
 def main():
-    st.title("OCR Web Application")
-    st.write("This application extracts text from an uploaded image and supports both Hindi and English languages.")
+    st.title("OCR Web Application with Qwen2-VL")
+    st.write("This application extracts text from an uploaded image and allows interaction with Qwen2-VL.")
 
     # Upload image
     uploaded_file = st.file_uploader("Choose an image file", type=["jpg", "jpeg", "png"])
@@ -43,18 +43,15 @@ def main():
         st.subheader("Extracted Text:")
         st.text_area(label="", value=extracted_text, height=250)
 
-        # Search functionality
-        st.subheader("Search in Extracted Text")
-        search_keyword = st.text_input("Enter a keyword to search")
+        # Additional interaction with Qwen2-VL
+        st.subheader("Interact with Qwen2-VL")
+        user_input = st.text_input("Ask something about the extracted text:")
 
-        if search_keyword:
-            # Check if the keyword exists in the extracted text
-            if search_keyword.lower() in extracted_text.lower():
-                st.success(f"Keyword '{search_keyword}' found!")
-                highlighted_text = extracted_text.replace(search_keyword, f"**{search_keyword}**")
-                st.write(highlighted_text, unsafe_allow_html=True)
-            else:
-                st.error(f"Keyword '{search_keyword}' not found.")
+        if user_input:
+            # Here you can add functionality to process the user input with the Qwen2-VL model
+            # For demonstration purposes, we can just display the user input
+            response = f"You asked: {user_input}. Here’s some processed response based on the extracted text."
+            st.write(response)
 
 if __name__ == "__main__":
     main()
