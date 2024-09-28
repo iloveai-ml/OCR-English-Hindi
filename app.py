@@ -2,12 +2,21 @@ import streamlit as st
 from PIL import Image
 import torch
 from transformers import AutoProcessor, VisionEncoderDecoderModel
-token="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"
-# Load the ColPali implementation and Qwen2-VL model
-ocr_model_name = "stepfun-ai/GOT-OCR2_0"  # Update with the correct Hugging Face model path if needed
-processor = AutoProcessor.from_pretrained(ocr_model_name,token=token)
-ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token,trust_remote_code=True)
+# token="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"
+# # Load the ColPali implementation and Qwen2-VL model
+# ocr_model_name = "stepfun-ai/GOT-OCR2_0"  # Update with the correct Hugging Face model path if needed
+# processor = AutoProcessor.from_pretrained(ocr_model_name,token=token)
+# ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token,trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained('ucaslcl/GOT-OCR2_0', trust_remote_code=True)
+ocr_model = AutoModel.from_pretrained('ucaslcl/GOT-OCR2_0', trust_remote_code=True)
+# model = model.eval().cuda()
 
+
+# input your test image
+# image_file = 'xxx.jpg'
+
+# plain texts OCR
+# res = model.chat(tokenizer, image_file, ocr_type='ocr')
 def extract_text(image):
     """Extracts text from the given image using the ColPali OCR model."""
     # Prepare the image for the model
