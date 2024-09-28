@@ -6,7 +6,7 @@ token="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"
 # Load the ColPali implementation and Qwen2-VL model
 ocr_model_name = "stepfun-ai/GOT-OCR2_0"  # Update with the correct Hugging Face model path if needed
 processor = AutoProcessor.from_pretrained(ocr_model_name,token=token)
-ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token)
+ocr_model = VisionEncoderDecoderModel.from_pretrained(ocr_model_name,token=token,trust_remote_code=True)
 
 def extract_text(image):
     """Extracts text from the given image using the ColPali OCR model."""
