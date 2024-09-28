@@ -1,24 +1,24 @@
 import streamlit as st
 from PIL import Image
 import torch
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel
-
-# Load the TrOCR model and processor
-model_name = "microsoft/trocr-base-printed"  # This model is designed for printed text
-processor = TrOCRProcessor.from_pretrained(model_name)
-model = VisionEncoderDecoderModel.from_pretrained(model_name)
+from transformers import AutoProcessor, AutoModelForTokenClassification
+token="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"
+# Load the model and processor
+model_name = "google/got-base"  # Using General OCR Theory (GOT) model
+processor = AutoProcessor.from_pretrained(model_name)
+model = AutoModelForTokenClassification.from_pretrained(model_name,token=token)
 
 def extract_text(image):
-    """Extracts text from the given image using the TrOCR model."""
+    """Extracts text from the given image using the GOT model."""
     # Prepare the image for the model
-    inputs = processor(images=image, return_tensors="pt")
+    inputs = processor(image, return_tensors="pt")
 
     # Perform OCR
     with torch.no_grad():
-        output = model.generate(**inputs)
+        outputs = model(**inputs)
 
-    # Decode the generated text
-    extracted_text = processor.decode(output[0], skip_special_tokens=True)
+    # Decode the outputs to get the extracted text
+    extracted_text = processor.decode(outputs.logits.argmax(dim=-1), skip_special_tokens=True)
     return extracted_text
 
 def main():
